@@ -1,0 +1,36 @@
+import { Box, Button, Image, Input, InputGroup, InputLeftElement, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Text } from '@chakra-ui/react';
+import React, { useRef, useState } from 'react';
+import logo from '../images/pcelogo.png'
+
+const Navbar = () => {
+       return (
+        <Box fontFamily={'Raleway'} backgroundColor={'#ffffff'}>
+            <Box padding={'10px'} display={{ base: 'none', md: 'block' }}>
+
+                <Box display={'flex'} justifyContent={'space-between'} flexDirection={'row'} alignItems={'center'}>
+                    <Box flexBasis={'10%'}>
+                        <Box fontSize={'40px'} fontWeight={'700'} px={'10px'}>
+                            <Image width={'60px'} src={logo} />
+                        </Box>
+                    </Box>
+                    
+                    <Box flexBasis={'25%'} display={'flex'} gap={6} flexDirection={'row'} alignItems={'center'} justifyContent={'center'}>
+                        <Box padding={'10px'}>
+                            <Button _hover={{bgColor:'#1b3058'}} rounded={8} fontSize={'17px'} color={'white'} fontWeight={700} padding={'20px'} py={'25px'} bgColor={'#a41d31'}>Login</Button>
+                        </Box>
+                        <Box padding={'10px'}>
+                            <Button _hover={{bgColor:'#1b3058'}}  rounded={8} fontSize={'17px'} color={'white'} fontWeight={700} padding={'20px'} py={'25px'} bgColor={'#a41d31'}>Log out</Button>
+                        </Box>
+
+                    </Box>
+                </Box>
+
+            </Box>
+            {/* //mobile view */}
+            <Box display={{ base: 'block', md: 'none' }}>
+            </Box>
+        </Box>
+    );
+}
+
+export default Navbar;
