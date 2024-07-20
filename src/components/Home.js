@@ -10,6 +10,13 @@ const Home = () => {
     const [file1Data, setFile1Data] = useState([]) 
     const [file2Data, setFile2Data] = useState([]) 
 
+    const feeMapping = {
+        'First Year': 124000,
+        'Second Year': 137054,
+        'Third Year': 129054,
+        'Fourth Year':130554
+    };
+    
     useEffect(() => {
         console.log(mergedData) 
     }, [mergedData]) 
@@ -95,21 +102,26 @@ const Home = () => {
         const fuse = new Fuse(flattenedData2, { keys: ["name"], includeScore: true, threshold: 0.3 }) 
 
         const merged = rows1.map(row1 => {
-            const name1 = row1[nameIndex1]?.toString().trim() 
-            const bestMatch = fuse.search(name1)[0]?.item || {} 
-            console.log(bestMatch)
-            console.log(10000 - bestMatch.disbursedAmount)
+            const name1 = row1[nameIndex1]?.toString().trim();
+            const yearName = row1[yearNameIndex1];
+            const bestMatch = fuse.search(name1)[0]?.item || {};
+
+            const totalFee = feeMapping[yearName] || 0;
+            const disbursedAmount = bestMatch.disbursedAmount || 0;
+            const remainingFee = totalFee - disbursedAmount;
+
             return [
                 name1,
                 row1[admissionNoIndex1],
-                row1[yearNameIndex1],
+                yearName,
                 bestMatch.scheme || '',
                 bestMatch.applicationNo || '',
                 bestMatch.course || '',
-                bestMatch.disbursedAmount || 0,
-                10000 - (bestMatch.disbursedAmount || 0)
-            ] 
-        }) 
+                disbursedAmount,
+                remainingFee
+            ];
+        });
+
 
         const finalHeader = [
             'Name', 'Admission_No', 'YearName',
