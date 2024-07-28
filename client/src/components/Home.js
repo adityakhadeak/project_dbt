@@ -136,6 +136,7 @@ const Home = () => {
 
         const merged = rows1.map(row1 => {
             const name1 = standardizeName(row1[nameIndex1]?.toString().trim())
+            const name=row1[nameIndex1]?.toString().trim()
             console.log(name1)
             const yearName = row1[yearNameIndex1];
             console.log(fuse.search(name1)[0]?.item || {})
@@ -146,7 +147,7 @@ const Home = () => {
             const remainingFee = totalFee - disbursedAmount;
             if (bestMatch == {}) return null
             return [
-                name1,
+                name,
                 row1[admissionNoIndex1],
                 yearName,
                 bestMatch.scheme || '',
