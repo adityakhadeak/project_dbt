@@ -1,10 +1,23 @@
-import { Box, Button, FormControl, FormErrorMessage, FormLabel, Input, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
-import { useFormik } from 'formik'
-import React, { useEffect, useState } from 'react'
-import * as Yup from 'yup'
-import * as XLSX from 'xlsx'
-import Fuse from 'fuse.js'
-import { useNavigate } from 'react-router-dom'
+import {
+    Box,
+    Button,
+    FormControl,
+    FormErrorMessage,
+    FormLabel,
+    Input,
+    Table,
+    Tbody,
+    Td,
+    Th,
+    Thead,
+    Tr,
+} from '@chakra-ui/react';
+import { useFormik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import * as Yup from 'yup';
+import * as XLSX from 'xlsx';
+import Fuse from 'fuse.js';
+import { useNavigate } from 'react-router-dom';
 import BeatLoader from "react-spinners/BeatLoader";
 
 const Home = () => {
@@ -99,10 +112,17 @@ const Home = () => {
             reader.onload = (e) => {
                 const workbook = XLSX.read(e.target.result, { type: 'binary' });
                 let allData = [];
+                const seen = new Set();
                 workbook.SheetNames.forEach(sheetName => {
                     const worksheet = workbook.Sheets[sheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                    allData = allData.concat(jsonData);
+                    jsonData.forEach(row => {
+                        const rowString = JSON.stringify(row);
+                        if (!seen.has(rowString)) {
+                            seen.add(rowString);
+                            allData.push(row);
+                        }
+                    });
                 });
                 resolve(allData);
             }
@@ -206,7 +226,7 @@ const Home = () => {
     }
 
     return (
-        <Box padding={'10px'}>
+        <Box bg={'#f4f6f8'} padding={'10px'}>
             <Box display={'flex'} flexDirection={'row'} justifyContent={'center'} alignItems={'center'}>
                 <form onSubmit={formik.handleSubmit}>
                     <FormControl isInvalid={formik.errors.file1} p='2px' my='5px'>
@@ -289,6 +309,6 @@ const Home = () => {
             )}
         </Box>
     );
-}
+};
 
 export default Home;
