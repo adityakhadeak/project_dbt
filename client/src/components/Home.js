@@ -27,6 +27,8 @@ const Home = () => {
     const [mergedData, setMergedData] = useState([]);
     const [file1Data, setFile1Data] = useState([]);
     const [file2Data, setFile2Data] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
 
     const css = {
         display: "block",
@@ -225,6 +227,17 @@ const Home = () => {
         }, 100);
     }
 
+    const handleSearch = (event) => {
+        const query = event.target.value.toLowerCase();
+        setSearchQuery(query);
+
+        const filteredData = mergedData.filter((row, index) => {
+            if (index === 0) return true; // Include header row
+            return row.some(cell => cell.toString().toLowerCase().includes(query));
+        });
+
+        setSearchResults(filteredData);
+    }
     return (
         <Box bg={'#f4f6f8'} padding={'10px'}>
             <Box display={'flex'} flexDirection={'row'} justifyContent={'center'} alignItems={'center'}>
@@ -265,7 +278,19 @@ const Home = () => {
                     </Box>
                 </form>
             </Box>
-            <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+            {mergedData.length > 0 && (  <Box display={'flex'} justifyContent={'center'} alignItems={'center'} mt={4}>
+                <FormControl width={'500px'}>
+                    <FormLabel>Search by name or admission number</FormLabel>
+                    <Input
+                        width={'500px'}
+                        placeholder="Search by name or admission number"
+                        value={searchQuery}
+                        onChange={handleSearch}
+                    />
+                </FormControl>
+            </Box>
+            )}
+            <Box my={'50px'} display={'flex'} justifyContent={'center'} alignItems={'center'}>
                 <BeatLoader
                     color={color}
                     loading={loading}
@@ -275,11 +300,38 @@ const Home = () => {
                     data-testid="loader"
                 />
             </Box>
-            {mergedData.length > 0 && (
+             {mergedData.length > 0 && (
+                <Box mt={4}>
+                    <Box display='flex' justifyContent={'center'} alignItems={'center'} width='100%' py='10px' my='20px'>
+                        <Button width='20%' height='45px' borderRadius='20px' colorScheme='blue' onClick={handleDownload}>
+                            Download Excel
+                        </Button>
+                    </Box>
+                    <Table variant="simple" size="sm" mt={4} bg={'white'} border={'1px solid #ccc'} borderRadius={'8px'}>
+                        <Thead>
+                            <Tr>
+                                {searchResults[0]?.map((header, index) => (
+                                    <Th key={index}>{header}</Th>
+                                ))}
+                            </Tr>
+                        </Thead>
+                        <Tbody>
+                            {searchResults?.slice(1).map((row, rowIndex) => (
+                                <Tr key={rowIndex}>
+                                    {row.map((cell, cellIndex) => (
+                                        <Td key={cellIndex}>{cell}</Td>
+                                    ))}
+                                </Tr>
+                            ))}
+                        </Tbody>
+                    </Table>
+                </Box>
+            )}
+            {/* {mergedData.length > 0 && (
                 <Box mt='20px'>
                     <Box display='flex' justifyContent={'center'} alignItems={'center'} width='100%' py='10px' my='20px'>
                         <Button width='20%' height='45px' borderRadius='20px' colorScheme='blue' onClick={handleDownload}>
-                            Download Merged Data
+                            Download Excel
                         </Button>
                     </Box>
                     <Table variant="simple" mt="4">
@@ -306,7 +358,7 @@ const Home = () => {
                         </Tbody>
                     </Table>
                 </Box>
-            )}
+            )} */}
         </Box>
     );
 };
