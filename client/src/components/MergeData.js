@@ -171,8 +171,8 @@ const MergedData = () => {
             const bestMatch = fuse.search(nameCollege)[0]?.item || {};
             const dbtDataEntry = dbtData[bestMatch.name] || {};
             const disbursedAmount = dbtDataEntry.disbursedAmount || 0;
-            const remainingAmount = dueAmount - disbursedAmount;
-
+            let remainingAmount = dueAmount - disbursedAmount;
+            if (remainingAmount < 0) remainingAmount = 0;
             if (!Object.keys(dbtDataEntry).length) return null;
 
             // Check if any column has a placeholder value
@@ -204,40 +204,40 @@ const MergedData = () => {
     };
 
     const handleDownload = () => {
-    // Create worksheet from merged data
-    const worksheet = XLSX.utils.aoa_to_sheet(mergedData);
+        // Create worksheet from merged data
+        const worksheet = XLSX.utils.aoa_to_sheet(mergedData);
 
-    // Calculate the max width for each column based on the length of content
-    const colWidths = mergedData[0].map((_, colIdx) => {
-        // Find the maximum length of content in each column
-        const maxLength = Math.max(...mergedData.map(row => (row[colIdx]?.toString().length || 0)));
-        
-        // Return width object, adding padding to column width
-        return { wch: Math.max(10, maxLength + 2) };  // 10 is the minimum width, and +2 for padding
-    });
+        // Calculate the max width for each column based on the length of content
+        const colWidths = mergedData[0].map((_, colIdx) => {
+            // Find the maximum length of content in each column
+            const maxLength = Math.max(...mergedData.map(row => (row[colIdx]?.toString().length || 0)));
 
-    // Assign column widths to worksheet
-    worksheet['!cols'] = colWidths;
+            // Return width object, adding padding to column width
+            return { wch: Math.max(10, maxLength + 2) };  // 10 is the minimum width, and +2 for padding
+        });
 
-    // Create workbook and append the worksheet
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+        // Assign column widths to worksheet
+        worksheet['!cols'] = colWidths;
 
-    // Generate Excel file and trigger download
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        // Create workbook and append the worksheet
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
-    const downloadLink = URL.createObjectURL(excelBlob);
-    const link = document.createElement('a');
-    link.href = downloadLink;
-    link.download = 'merged_data.xlsx';
-    link.click();
+        // Generate Excel file and trigger download
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
-    // Cleanup the download link object
-    setTimeout(() => {
-        URL.revokeObjectURL(downloadLink);
-    }, 100);
-};
+        const downloadLink = URL.createObjectURL(excelBlob);
+        const link = document.createElement('a');
+        link.href = downloadLink;
+        link.download = 'merged_data.xlsx';
+        link.click();
+
+        // Cleanup the download link object
+        setTimeout(() => {
+            URL.revokeObjectURL(downloadLink);
+        }, 100);
+    };
 
     const handleSearch = (event) => {
         const query = event.target.value.toLowerCase();
