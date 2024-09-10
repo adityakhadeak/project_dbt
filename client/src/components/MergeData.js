@@ -174,7 +174,7 @@ const MergedData = () => {
             const remainingAmount = dueAmount - disbursedAmount;
 
             if (!Object.keys(dbtDataEntry).length) return null;
-            
+
             // Check if any column has a placeholder value
             if (
                 nameCollege === 'Name' ||
@@ -204,23 +204,40 @@ const MergedData = () => {
     };
 
     const handleDownload = () => {
-        const worksheet = XLSX.utils.aoa_to_sheet(mergedData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    // Create worksheet from merged data
+    const worksheet = XLSX.utils.aoa_to_sheet(mergedData);
 
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    // Calculate the max width for each column based on the length of content
+    const colWidths = mergedData[0].map((_, colIdx) => {
+        // Find the maximum length of content in each column
+        const maxLength = Math.max(...mergedData.map(row => (row[colIdx]?.toString().length || 0)));
+        
+        // Return width object, adding padding to column width
+        return { wch: Math.max(10, maxLength + 2) };  // 10 is the minimum width, and +2 for padding
+    });
 
-        const downloadLink = URL.createObjectURL(excelBlob);
-        const link = document.createElement('a');
-        link.href = downloadLink;
-        link.download = 'merged_data.xlsx';
-        link.click();
+    // Assign column widths to worksheet
+    worksheet['!cols'] = colWidths;
 
-        setTimeout(() => {
-            URL.revokeObjectURL(downloadLink);
-        }, 100);
-    };
+    // Create workbook and append the worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // Generate Excel file and trigger download
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const excelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+    const downloadLink = URL.createObjectURL(excelBlob);
+    const link = document.createElement('a');
+    link.href = downloadLink;
+    link.download = 'merged_data.xlsx';
+    link.click();
+
+    // Cleanup the download link object
+    setTimeout(() => {
+        URL.revokeObjectURL(downloadLink);
+    }, 100);
+};
 
     const handleSearch = (event) => {
         const query = event.target.value.toLowerCase();
