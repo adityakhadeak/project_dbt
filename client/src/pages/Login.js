@@ -10,8 +10,7 @@ import useIsAuthenticated from 'react-auth-kit/hooks/useIsAuthenticated'
 
 
 const Login = () => {
-
-    const { handleLogin } = useContext(UserContext);
+    const { handleLogin,loading } = useContext(UserContext);
     const navigate = useNavigate()
     const isAuthenticated = useIsAuthenticated()
     useEffect(() => {
@@ -35,8 +34,8 @@ const Login = () => {
         }),
         onSubmit: async (values, actions) => {
             if (!formik.errors.password && !formik.errors.username) {
-                const istrue=await handleLogin(values.username, values.password)
-                if(istrue)
+                const istrue = await handleLogin(values.username, values.password)
+                if (istrue)
                     navigate('/login')
             }
             actions.resetForm()
@@ -81,7 +80,7 @@ const Login = () => {
 
                         </FormControl>
                         <Box display='flex' justifyContent={'center'} alignItems={'center'} width='100%' py='10px' my='20px'>
-                            <Button width='90%' height='45px' borderRadius='20px' color={'white'} bgColor={'#a41d31'} type='submit'>Sign in</Button>
+                            <Button isLoading={loading} width='90%' height='45px' borderRadius='20px' color={'white'} bgColor={'#a41d31'} type='submit'>Sign in</Button>
                         </Box>
 
                     </form>
