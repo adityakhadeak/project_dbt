@@ -4,12 +4,14 @@ import Home from './components/Home';
 import RootLayout from './layouts/RootLayout';
 import Login from './pages/Login';
 import RequireAuth from '@auth-kit/react-router/RequireAuth'
+import MergedData from './components/MergeData';
 function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path='/' element={<RootLayout />} >
         <Route index element={<RequireAuth fallbackPath="/login">
-          <Home />
+          <MergedData />
+          {/* <Home /> */}
         </RequireAuth>} />
         <Route path='/login' element={<Login />} />
       </Route>
