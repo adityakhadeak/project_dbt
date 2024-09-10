@@ -171,7 +171,7 @@ const MergedData = () => {
         }).filter(row => row !== null); // Remove null rows
 
         const finalHeader = [
-            'Name', 'Admission No', 'Batch', 'Year', 'Scheme', 'Application No', 'To be Paid','Disbursed Amount', 'Remaining Amount',
+            'Name', 'Admission No', 'Batch', 'Year', 'Scheme', 'Application No', 'To be Paid', 'Disbursed Amount', 'Remaining Amount',
         ];
         setMergedData([finalHeader, ...merged]);
     };
@@ -249,7 +249,7 @@ const MergedData = () => {
                 <Box display={'flex'} justifyContent={'center'} alignItems={'center'} flexDirection={'column'}>
                     <Box maxHeight={'500px'} overflowY={'scroll'}>
                         <Table variant='striped' size={'sm'}>
-                            <Thead bg={'blue.500'}>
+                            <Thead bg={'blue.500'} position='sticky' top={0} zIndex={1}>
                                 <Tr>
                                     {mergedData[0].map((header, idx) => (
                                         <Th key={idx} color={'white'}>{header}</Th>
