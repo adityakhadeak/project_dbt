@@ -174,7 +174,16 @@ const MergedData = () => {
             const remainingAmount = dueAmount - disbursedAmount;
 
             if (!Object.keys(dbtDataEntry).length) return null;
-
+            
+            // Check if any column has a placeholder value
+            if (
+                nameCollege === 'Name' ||
+                admissionNo === 'Admission No.' ||
+                batch === 'Batch' ||
+                year === 'Year'
+            ) {
+                return null;
+            }
             return [
                 row[nameIndexCollege],
                 admissionNo,
