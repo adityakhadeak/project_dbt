@@ -34,7 +34,7 @@ const Navbar = () => {
                                 <Button as={Link} to={'/login'} _hover={{ bgColor: '#1b3058' }} rounded={8} fontSize={'17px'} color={'white'} fontWeight={700} padding={'20px'} py={'25px'} bgColor={'#a41d31'}>Login</Button>
                             </Box>
                         ) : (
-                            <Box Box padding={'10px'}>
+                            <Box  padding={'10px'}>
                                 <Button onClick={logout} _hover={{ bgColor: '#1b3058' }} rounded={8} fontSize={'17px'} color={'white'} fontWeight={700} padding={'20px'} py={'25px'} bgColor={'#a41d31'}>Log out</Button>
                             </Box>
                         )

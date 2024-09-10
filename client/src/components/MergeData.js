@@ -96,23 +96,40 @@ const MergedData = () => {
 
                     const [header, ...rows] = jsonData;
 
+                    // Create a Set to store unique combinations (to eliminate duplicates)
+                    const seenEntries = new Set();
+
                     rows.forEach(row => {
+                        // console.log(row[header.indexOf('Scheme')]);  // Check what is returned for the 'Scheme' column
+
                         const name = standardizeName(row[header.indexOf('Beneficiary Name')]);
                         const disbursedAmount = parseFloat(row[header.indexOf('Disbursed Amount(₹)')]) || 0;
                         const scheme = row[header.indexOf('Scheme')];
+                        // console.log(scheme)
                         const applicationNo = row[header.indexOf('Application No')];
 
-                        if (!combinedData[name]) {
-                            combinedData[name] = {
-                                disbursedAmount: 0,
-                                scheme,
-                                applicationNo,
-                            };
-                        }
+                        // Create a unique key to check for duplicates based on 'name', 'scheme', and 'applicationNo'
+                        const uniqueKey = `${name}-${scheme}-${applicationNo}`;
+                        const uniqueKey1 = `${name}-${scheme}`;
 
-                        combinedData[name].disbursedAmount += disbursedAmount;
+                        // Only process if the unique key has not been seen before
+                        if (!seenEntries.has(uniqueKey)) {
+                            seenEntries.add(uniqueKey);  // Add key to the set to avoid duplicates
+
+                            if (!combinedData[uniqueKey1]) {
+                                combinedData[uniqueKey1] = {
+                                    disbursedAmount: 0,
+                                    scheme,
+                                    applicationNo,
+                                };
+                            }
+                            console.log('Combined Data for:', name, combinedData[uniqueKey1]);  // Log to check
+
+                            combinedData[uniqueKey1].disbursedAmount += disbursedAmount;
+                        }
                     });
                 });
+                console.log("DBT Data:", combinedData);  // Log DBT data to inspect if scheme exists
 
                 resolve(combinedData);
             };
@@ -120,6 +137,7 @@ const MergedData = () => {
             reader.readAsBinaryString(file);
         });
     };
+
 
     const standardizeName = (name) => {
         if (!name) return '';
