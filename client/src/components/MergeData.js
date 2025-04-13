@@ -105,6 +105,7 @@ const MergedData = () => {
 
                         const name = standardizeName(row[header.indexOf('Beneficiary Name')]);
                         const disbursedAmount = parseFloat(row[header.indexOf('Disbursed Amount(₹)')]) || 0;
+                        const disbursedAmountt = parseFloat(row[header.indexOf('Disbursed Amount(₹)')]) || 0;
                         const scheme = row[header.indexOf('Scheme')];
                         // console.log(scheme)
                         const applicationNo = row[header.indexOf('Application No')];
@@ -131,12 +132,18 @@ const MergedData = () => {
                                 combinedData[uniqueKey1].disbursedAmount += disbursedAmount;
 
 
-                            if (transactionId && creditDate) {
+                            if (transactionId && creditDate && disbursedAmountt) {
                                 const txnKey = `transaction_id_${installmentNumber}`;
                                 const creditKey = `credit_date_${installmentNumber}`;
+                                const disbursedAmountkey = `disbursed_amount_${installmentNumber}`;
 
                                 combinedData[uniqueKey1][txnKey] = transactionId;
                                 combinedData[uniqueKey1][creditKey] = creditDate;
+                                if (status === 'Fund Disbursed') {
+                                    combinedData[uniqueKey1][disbursedAmountkey] = disbursedAmountt;
+                                }
+                                else { combinedData[uniqueKey1][disbursedAmountkey] = "---"; }
+
                             }
                         }
                     });
@@ -187,10 +194,12 @@ const MergedData = () => {
             if (remainingAmount < 0) remainingAmount = 0;
             if (!Object.keys(dbtDataEntry).length) return null;
 
-            const transaction_id_1 = dbtDataEntry.transaction_id_1 || 0;
-            const transaction_id_2 = dbtDataEntry.transaction_id_2 || 0;
-            const credit_date_1 = dbtDataEntry.credit_date_1 || 0;
-            const credit_date_2 = dbtDataEntry.credit_date_2 || 0;
+            const transaction_id_1 = dbtDataEntry.transaction_id_1 || "---";
+            const transaction_id_2 = dbtDataEntry.transaction_id_2 || "---";
+            const credit_date_1 = dbtDataEntry.credit_date_1 || "---";
+            const credit_date_2 = dbtDataEntry.credit_date_2 || "---";
+            const disbursed_amount_1 = dbtDataEntry.disbursed_amount_1 || "---";
+            const disbursed_amount_2 = dbtDataEntry.disbursed_amount_2 || "---";
 
             // Check if any column has a placeholder value
             if (
@@ -211,6 +220,8 @@ const MergedData = () => {
                 dueAmount,
                 disbursedAmount,
                 remainingAmount,
+                disbursed_amount_1,
+                disbursed_amount_2,
                 transaction_id_1,
                 transaction_id_2,
                 credit_date_1,
@@ -219,7 +230,7 @@ const MergedData = () => {
         }).filter(row => row !== null); // Remove null rows
 
         const finalHeader = [
-            'Name', 'Admission No', 'Batch', 'Year', 'Scheme', 'Application No', 'To be Paid', 'Disbursed Amount (Total(₹))', 'Remaining Amount', 'Transaction ID (1st Install)', 'Transaction ID (2nd Install)',
+            'Name', 'Admission No', 'Batch', 'Year', 'Scheme', 'Application No', 'To be Paid', 'Disbursed Amount (Total(₹))', 'Remaining Amount', 'Disbursed Amount (1st Install)', 'Disbursed Amount (2nd Install)', 'Transaction ID (1st Install)', 'Transaction ID (2nd Install)',
             'Credit Date (1st Install)', 'Credit Date (2nd Install)',
         ];
         setMergedData([finalHeader, ...merged]);
