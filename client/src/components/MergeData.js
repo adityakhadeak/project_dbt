@@ -90,7 +90,8 @@ const MergedData = () => {
                 const workbook = XLSX.read(e.target.result, { type: 'binary' });
                 let combinedData = {};
 
-                workbook.SheetNames.forEach(sheetName => {
+                workbook.SheetNames.forEach((sheetName, sheetIndex) => {
+                    const installmentNumber = sheetIndex + 1; // 1-based index
                     const worksheet = workbook.Sheets[sheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
@@ -107,7 +108,9 @@ const MergedData = () => {
                         const scheme = row[header.indexOf('Scheme')];
                         // console.log(scheme)
                         const applicationNo = row[header.indexOf('Application No')];
-
+                        const transactionId = row[header.indexOf('Transaction ID')];
+                        const creditDate = row[header.indexOf('Credit Date')];
+                        const status = row[header.indexOf('Status')];
                         // Create a unique key to check for duplicates based on 'name', 'scheme', and 'applicationNo'
                         const uniqueKey = `${name}-${scheme}-${applicationNo}`;
                         const uniqueKey1 = `${name}-${scheme}`;
@@ -124,8 +127,17 @@ const MergedData = () => {
                                 };
                             }
                             console.log('Combined Data for:', name, combinedData[uniqueKey1]);  // Log to check
+                            if (status === 'Fund Disbursed')
+                                combinedData[uniqueKey1].disbursedAmount += disbursedAmount;
 
-                            combinedData[uniqueKey1].disbursedAmount += disbursedAmount;
+
+                            if (transactionId && creditDate) {
+                                const txnKey = `transaction_id_${installmentNumber}`;
+                                const creditKey = `credit_date_${installmentNumber}`;
+
+                                combinedData[uniqueKey1][txnKey] = transactionId;
+                                combinedData[uniqueKey1][creditKey] = creditDate;
+                            }
                         }
                     });
                 });
@@ -175,6 +187,11 @@ const MergedData = () => {
             if (remainingAmount < 0) remainingAmount = 0;
             if (!Object.keys(dbtDataEntry).length) return null;
 
+            const transaction_id_1 = dbtDataEntry.transaction_id_1 || 0;
+            const transaction_id_2 = dbtDataEntry.transaction_id_2 || 0;
+            const credit_date_1 = dbtDataEntry.credit_date_1 || 0;
+            const credit_date_2 = dbtDataEntry.credit_date_2 || 0;
+
             // Check if any column has a placeholder value
             if (
                 nameCollege === 'Name' ||
@@ -194,11 +211,16 @@ const MergedData = () => {
                 dueAmount,
                 disbursedAmount,
                 remainingAmount,
+                transaction_id_1,
+                transaction_id_2,
+                credit_date_1,
+                credit_date_2
             ];
         }).filter(row => row !== null); // Remove null rows
 
         const finalHeader = [
-            'Name', 'Admission No', 'Batch', 'Year', 'Scheme', 'Application No', 'To be Paid', 'Disbursed Amount', 'Remaining Amount',
+            'Name', 'Admission No', 'Batch', 'Year', 'Scheme', 'Application No', 'To be Paid', 'Disbursed Amount (Total(₹))', 'Remaining Amount', 'Transaction ID (1st Install)', 'Transaction ID (2nd Install)',
+            'Credit Date (1st Install)', 'Credit Date (2nd Install)',
         ];
         setMergedData([finalHeader, ...merged]);
     };
